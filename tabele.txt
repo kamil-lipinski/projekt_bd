@@ -29,7 +29,6 @@ CREATE TABLE z_weather(
     dew NUMBER,
     humidity NUMBER,
     precip NUMBER,
-    precipprob NUMBER,
     precipcover NUMBER,
     preciptype VARCHAR2(50),
     snow NUMBER,
