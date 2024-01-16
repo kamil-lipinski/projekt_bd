@@ -158,44 +158,60 @@ CREATE TABLE z_desc_archive(
     description VARCHAR(500)
 );
 
-CREATE SEQUENCE z_country_archive_seq START WITH 1 INCREMENT BY 1;
-CREATE OR REPLACE TRIGGER z_country_archive_auto_increment
-BEFORE INSERT ON z_country_archive FOR EACH ROW
+
+/* MAIN TABLES ON DELETE TRIGERS*/
+
+CREATE OR REPLACE TRIGGER z_archive_country
+BEFORE DELETE ON z_country
+FOR EACH ROW
 BEGIN
-    SELECT z_country_archive_seq.NEXTVAL INTO :NEW.country_archive_id FROM DUAL;
+  INSERT INTO z_country_archive (country_archive_id, name)
+  VALUES (:OLD.country_id, :OLD.name);
 END;
 
-CREATE SEQUENCE z_region_archive_seq START WITH 1 INCREMENT BY 1;
-CREATE OR REPLACE TRIGGER z_region_archive_auto_increment
-BEFORE INSERT ON z_region_archive FOR EACH ROW
+CREATE OR REPLACE TRIGGER z_archive_region
+BEFORE DELETE ON z_region
+FOR EACH ROW
 BEGIN
-    SELECT z_region_archive_seq.NEXTVAL INTO :NEW.region_archive_id FROM DUAL;
+  INSERT INTO z_region_archive (region_archive_id, name, country_archive_id)
+  VALUES (:OLD.region_id, :OLD.name, :OLD.country_id);
 END;
 
-CREATE SEQUENCE z_city_archive_seq START WITH 1 INCREMENT BY 1;
-CREATE OR REPLACE TRIGGER z_city_archive_auto_increment
-BEFORE INSERT ON z_city_archive FOR EACH ROW
+CREATE OR REPLACE TRIGGER z_archive_city
+BEFORE DELETE ON z_city
+FOR EACH ROW
 BEGIN
-    SELECT z_city_archive_seq.NEXTVAL INTO :NEW.city_archive_id FROM DUAL;
+  INSERT INTO z_city_archive (city_archive_id, name, region_archive_id)
+  VALUES (:OLD.city_id, :OLD.name, :OLD.region_id);
 END;
 
-CREATE SEQUENCE z_weather_archive_seq START WITH 1 INCREMENT BY 1;
-CREATE OR REPLACE TRIGGER z_weather_archive_auto_increment
-BEFORE INSERT ON z_weather_archive FOR EACH ROW
+CREATE OR REPLACE TRIGGER z_archive_weather
+BEFORE DELETE ON z_weather
+FOR EACH ROW
 BEGIN
-    SELECT z_weather_archive_seq.NEXTVAL INTO :NEW.weather_archive_id FROM DUAL;
+  INSERT INTO z_weather_archive (weather_archive_id, city_archive_id, datetime, 
+  tempmax, tempmin, temp, feelslikemax, feelslikemin, feelslike, dew, humidity,
+  precip, precipcover, preciptype, snow, snowdepth, windgust, windspeed, winddir,
+  sealevelpressure, cloudcover, visibility)
+  VALUES (:OLD.weather_id, :OLD.city_id, :OLD.datetime, :OLD.tempmax, :OLD.tempmin,
+  :OLD.temp, :OLD.feelslikemax, :OLD.feelslikemin, :OLD.feelslike, :OLD.dew, 
+  :OLD.humidity, :OLD.precip, :OLD.precipcover, :OLD.preciptype, :OLD.snow, 
+  :OLD.snowdepth, :OLD.windgust, :OLD.windspeed, :OLD.winddir, :OLD.sealevelpressure, 
+  :OLD.cloudcover, :OLD.visibility);
 END;
 
-CREATE SEQUENCE z_astrology_archive_seq START WITH 1 INCREMENT BY 1;
-CREATE OR REPLACE TRIGGER z_astrology_archive_auto_increment
-BEFORE INSERT ON z_astrology_archive FOR EACH ROW
+CREATE OR REPLACE TRIGGER z_archive_astrology
+BEFORE DELETE ON z_astrology
+FOR EACH ROW
 BEGIN
-    SELECT z_astrology_archive_seq.NEXTVAL INTO :NEW.astrology_archive_id FROM DUAL;
+  INSERT INTO z_astrology_archive (astrology_archive_id, weather_archive_id, sunrise, sunset, moonphase)
+  VALUES (:OLD.astrology_id, :OLD.weather_id, :OLD.sunrise, :OLD.sunset, :OLD.moonphase);
 END;
 
-CREATE SEQUENCE z_desc_archive_seq START WITH 1 INCREMENT BY 1;
-CREATE OR REPLACE TRIGGER z_desc_archive_auto_increment
-BEFORE INSERT ON z_desc_archive FOR EACH ROW
+CREATE OR REPLACE TRIGGER z_archive_desc
+BEFORE DELETE ON z_desc
+FOR EACH ROW
 BEGIN
-    SELECT z_desc_archive_seq.NEXTVAL INTO :NEW.desc_archive_id FROM DUAL;
+  INSERT INTO z_desc_archive (desc_archive_id, weather_archive_id, conditions, description)
+  VALUES (:OLD.desc_id, :OLD.weather_id, :OLD.conditions, :OLD.description);
 END;
