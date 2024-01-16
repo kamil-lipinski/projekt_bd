@@ -1,8 +1,9 @@
+/* MAIN TABLES */
+
 CREATE TABLE z_country(
     country_id NUMBER PRIMARY KEY, 
     name VARCHAR2(100)
 );
-
 
 CREATE TABLE z_region(
     region_id NUMBER PRIMARY KEY, 
@@ -215,3 +216,318 @@ BEGIN
   INSERT INTO z_desc_archive (desc_id, weather_id, conditions, description)
   VALUES (:OLD.desc_id, :OLD.weather_id, :OLD.conditions, :OLD.description);
 END;
+
+/* LOG TABLE */
+
+CREATE TABLE z_log(
+    log_id NUMBER PRIMARY KEY,
+    log_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    log_module VARCHAR2(100),
+    log_action VARCHAR2(100),
+    log_message VARCHAR2(500)
+);
+
+CREATE SEQUENCE z_log_seq START WITH 1 INCREMENT BY 1;
+CREATE OR REPLACE TRIGGER z_log_auto_increment
+BEFORE INSERT ON z_log FOR EACH ROW
+BEGIN
+    SELECT z_log_seq.NEXTVAL INTO :NEW.log_id FROM DUAL;
+END;
+
+
+/* ADD ROW PROCEDURES */
+
+CREATE OR REPLACE PROCEDURE z_add_country (
+    p_name VARCHAR2,
+    p_country_id OUT NUMBER
+) AS
+    v_log_module VARCHAR2(100);
+    v_log_action VARCHAR2(100);
+    v_log_message VARCHAR2(500);
+BEGIN
+    IF p_name IS NULL OR REGEXP_LIKE(p_name, '\d') THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Invalid country name format');
+    END IF;
+
+    INSERT INTO z_country (name) VALUES (p_name) RETURNING country_id INTO p_country_id;
+    COMMIT;
+
+    v_log_module := 'z_add_country';
+    v_log_action := 'INSERT';
+    v_log_message := 'Country added: ' || p_name || ', Country ID: ' || p_country_id;
+    INSERT INTO z_log (log_module, log_action, log_message)
+    VALUES (v_log_module, v_log_action, v_log_message);
+        
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+
+        v_log_module := 'z_add_country';
+        v_log_action := 'ERROR';
+        v_log_message := 'Error adding country: ' || p_name || ', Error: ' || SQLERRM;
+        INSERT INTO z_log (log_module, log_action, log_message)
+        VALUES (v_log_module, v_log_action, v_log_message);
+        RAISE;
+END;
+
+CREATE OR REPLACE PROCEDURE z_add_region (
+    p_name VARCHAR2,
+    p_country_id NUMBER,
+    p_region_id OUT NUMBER
+) AS
+    v_log_module VARCHAR2(100);
+    v_log_action VARCHAR2(100);
+    v_log_message VARCHAR2(500);
+BEGIN
+    IF p_name IS NULL OR REGEXP_LIKE(p_name, '\d') THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Invalid region name format');
+    END IF;
+    
+    DECLARE
+        v_country_count NUMBER;
+    BEGIN
+        SELECT COUNT(*) INTO v_country_count FROM z_country WHERE country_id = p_country_id;
+
+        IF v_country_count = 0 THEN
+            RAISE_APPLICATION_ERROR(-20002, 'Invalid country_id. Country does not exist.');
+        END IF;
+    END;
+
+    INSERT INTO z_region (name, country_id) VALUES (p_name, p_country_id) RETURNING region_id INTO p_region_id;
+    COMMIT;
+    
+    v_log_module := 'z_add_region';
+    v_log_action := 'INSERT';
+    v_log_message := 'Region added: ' || p_name || ', Region ID: ' || p_region_id;
+    INSERT INTO z_log (log_module, log_action, log_message)
+    VALUES (v_log_module, v_log_action, v_log_message);
+        
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        
+        v_log_module := 'z_add_region';
+        v_log_action := 'ERROR';
+        v_log_message := 'Error adding region: ' || p_name || ', Error: ' || SQLERRM;
+        INSERT INTO z_log (log_module, log_action, log_message)
+        VALUES (v_log_module, v_log_action, v_log_message);
+        RAISE;
+END;
+
+CREATE OR REPLACE PROCEDURE z_add_city (
+    p_name VARCHAR2,
+    p_region_id NUMBER,
+    p_city_id OUT NUMBER
+) AS
+    v_log_module VARCHAR2(100);
+    v_log_action VARCHAR2(100);
+    v_log_message VARCHAR2(500);
+BEGIN
+    IF p_name IS NULL OR REGEXP_LIKE(p_name, '\d') THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Invalid city name format');
+    END IF;
+    
+    DECLARE
+        v_region_count NUMBER;
+    BEGIN
+        SELECT COUNT(*) INTO v_region_count FROM z_region WHERE region_id = p_region_id;
+
+        IF v_region_count = 0 THEN
+            RAISE_APPLICATION_ERROR(-20002, 'Invalid region_id. Region does not exist.');
+        END IF;
+    END;
+
+    INSERT INTO z_city (name, region_id) VALUES (p_name, p_region_id) RETURNING city_id INTO p_city_id;
+    COMMIT;
+    
+    v_log_module := 'z_add_city';
+    v_log_action := 'INSERT';
+    v_log_message := 'City added: ' || p_name || ', City ID: ' || p_city_id;
+    INSERT INTO z_log (log_module, log_action, log_message)
+    VALUES (v_log_module, v_log_action, v_log_message);
+        
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        
+        v_log_module := 'z_add_city';
+        v_log_action := 'ERROR';
+        v_log_message := 'Error adding city: ' || p_name || ', Error: ' || SQLERRM;
+        INSERT INTO z_log (log_module, log_action, log_message)
+        VALUES (v_log_module, v_log_action, v_log_message);
+        RAISE;
+END;
+
+CREATE OR REPLACE PROCEDURE z_add_weather (
+    p_city_id NUMBER,
+    p_datetime DATE,
+    p_tempmax NUMBER,
+    p_tempmin NUMBER,
+    p_temp NUMBER,
+    p_feelslikemax NUMBER,
+    p_feelslikemin NUMBER,
+    p_feelslike NUMBER,
+    p_dew NUMBER,
+    p_humidity NUMBER,
+    p_precip NUMBER,
+    p_precipcover NUMBER,
+    p_preciptype VARCHAR2,
+    p_snow NUMBER,
+    p_snowdepth NUMBER,
+    p_windgust NUMBER,
+    p_windspeed NUMBER,
+    p_winddir NUMBER,
+    p_sealevelpressure NUMBER,
+    p_cloudcover NUMBER,
+    p_visibility NUMBER,
+    p_weather_id OUT NUMBER
+) AS
+    v_log_module VARCHAR2(100);
+    v_log_action VARCHAR2(100);
+    v_log_message VARCHAR2(500);
+BEGIN
+    
+    DECLARE
+        v_city_count NUMBER;
+    BEGIN
+        SELECT COUNT(*) INTO v_city_count FROM z_city WHERE city_id = p_city_id;
+
+        IF v_city_count = 0 THEN
+            RAISE_APPLICATION_ERROR(-20002, 'Invalid city_id. City does not exist.');
+        END IF;
+    END;
+    
+    BEGIN
+        IF TO_DATE(p_datetime, 'YYYY-MM-DD') IS NULL THEN
+            RAISE_APPLICATION_ERROR(-20003, 'Invalid date format.');
+        END IF;
+    END;
+
+    INSERT INTO z_weather (city_id, datetime, tempmax, tempmin, temp, feelslikemax, 
+        feelslikemin, feelslike, dew, humidity, precip, precipcover, preciptype, 
+        snow, snowdepth, windgust, windspeed, winddir, sealevelpressure, cloudcover, visibility)
+    VALUES(p_city_id, p_datetime, p_tempmax, p_tempmin, p_temp, p_feelslikemax,
+        p_feelslikemin, p_feelslike, p_dew, p_humidity, p_precip, p_precipcover,
+        p_preciptype, p_snow, p_snowdepth, p_windgust, p_windspeed, p_winddir,
+        p_sealevelpressure, p_cloudcover, p_visibility) 
+    RETURNING weather_id INTO p_weather_id;
+    
+    COMMIT;
+    
+    v_log_module := 'z_add_weather';
+    v_log_action := 'INSERT';
+    v_log_message := 'Weather added with ID: ' || p_weather_id;
+    INSERT INTO z_log (log_module, log_action, log_message)
+    VALUES (v_log_module, v_log_action, v_log_message);
+        
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        
+        v_log_module := 'z_add_weather';
+        v_log_action := 'ERROR';
+        v_log_message := 'Error adding weather, Error: ' || SQLERRM;
+        INSERT INTO z_log (log_module, log_action, log_message)
+        VALUES (v_log_module, v_log_action, v_log_message);
+        RAISE;
+END;
+
+CREATE OR REPLACE PROCEDURE z_add_astrology (
+    p_weather_id NUMBER,
+    p_sunrise VARCHAR2,
+    p_sunset VARCHAR2,
+    p_moonphase NUMBER,
+    p_astrology_id OUT NUMBER
+) AS
+    v_log_module VARCHAR2(100);
+    v_log_action VARCHAR2(100);
+    v_log_message VARCHAR2(500);
+BEGIN
+    DECLARE
+        v_weather_count NUMBER;
+    BEGIN
+        SELECT COUNT(*) INTO v_weather_count FROM z_weather WHERE weather_id = p_weather_id;
+
+        IF v_weather_count = 0 THEN
+            RAISE_APPLICATION_ERROR(-20002, 'Invalid weather_id. Weather does not exist.');
+        END IF;
+    END;
+    
+    BEGIN
+        IF TO_TIMESTAMP(p_sunrise, 'YYYY-MM-DD"T"HH24:MI:SS') IS NULL THEN
+            RAISE_APPLICATION_ERROR(-20004, 'Invalid timestamp format for sunrise.');
+        END IF;
+    END;
+    
+    BEGIN
+        IF TO_TIMESTAMP(p_sunset, 'YYYY-MM-DD"T"HH24:MI:SS') IS NULL THEN
+            RAISE_APPLICATION_ERROR(-20004, 'Invalid timestamp format for sunset.');
+        END IF;
+    END;
+    
+    INSERT INTO z_astrology (weather_id, sunrise, sunset, moonphase) 
+    VALUES (p_weather_id, TO_TIMESTAMP(p_sunrise, 'YYYY-MM-DD"T"HH24:MI:SS'), TO_TIMESTAMP(p_sunset, 'YYYY-MM-DD"T"HH24:MI:SS'), p_moonphase) 
+    RETURNING astrology_id INTO p_astrology_id;
+
+    COMMIT;
+
+    v_log_module := 'z_add_astrology';
+    v_log_action := 'INSERT';
+    v_log_message := 'Astrology added with ID: ' || p_astrology_id;
+    INSERT INTO z_log (log_module, log_action, log_message)
+    VALUES (v_log_module, v_log_action, v_log_message);
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+
+        v_log_module := 'z_add_astrology';
+        v_log_action := 'ERROR';
+        v_log_message := 'Error adding astrology, Error: ' || SQLERRM;
+        INSERT INTO z_log (log_module, log_action, log_message)
+        VALUES (v_log_module, v_log_action, v_log_message);
+        RAISE;
+END;
+
+CREATE OR REPLACE PROCEDURE z_add_desc (
+    p_weather_id VARCHAR2,
+    p_conditions VARCHAR2 DEFAULT '',
+    p_description VARCHAR2 DEFAULT '',
+    p_desc_id OUT NUMBER
+) AS
+    v_log_module VARCHAR2(100);
+    v_log_action VARCHAR2(100);
+    v_log_message VARCHAR2(500);
+BEGIN
+    DECLARE
+        v_weather_count NUMBER;
+    BEGIN
+        SELECT COUNT(*) INTO v_weather_count FROM z_weather WHERE weather_id = p_weather_id;
+
+        IF v_weather_count = 0 THEN
+            RAISE_APPLICATION_ERROR(-20002, 'Invalid weather_id. Weather does not exist.');
+        END IF;
+    END;
+    
+    INSERT INTO z_desc (weather_id, conditions, description) VALUES (p_weather_id, p_conditions, p_description) 
+    RETURNING desc_id INTO p_desc_id;
+    COMMIT;
+
+    v_log_module := 'z_add_desc';
+    v_log_action := 'INSERT';
+    v_log_message := 'Description added with ID: ' || p_desc_id;
+    INSERT INTO z_log (log_module, log_action, log_message)
+    VALUES (v_log_module, v_log_action, v_log_message);
+        
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+
+        v_log_module := 'z_add_desc';
+        v_log_action := 'ERROR';
+        v_log_message := 'Error adding description, Error: ' || SQLERRM;
+        INSERT INTO z_log (log_module, log_action, log_message)
+        VALUES (v_log_module, v_log_action, v_log_message);
+        RAISE;
+END;
+
