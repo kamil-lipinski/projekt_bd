@@ -7,18 +7,18 @@ CREATE TABLE z_country(
 CREATE TABLE z_region(
     region_id NUMBER PRIMARY KEY, 
     name VARCHAR2(100),
-    country_id NUMBER, CONSTRAINT FK_region_country FOREIGN KEY (country_id) REFERENCES z_country(country_id)
+    country_id NUMBER, CONSTRAINT FK_region_country FOREIGN KEY (country_id) REFERENCES z_country(country_id) ON DELETE CASCADE
 );
 
 CREATE TABLE z_city(
     city_id NUMBER PRIMARY KEY, 
     name VARCHAR2(100),
-    region_id NUMBER, CONSTRAINT FK_city_region FOREIGN KEY (region_id) REFERENCES z_region(region_id)
+    region_id NUMBER, CONSTRAINT FK_city_region FOREIGN KEY (region_id) REFERENCES z_region(region_id) ON DELETE CASCADE
 );
 
 CREATE TABLE z_weather(
     weather_id NUMBER PRIMARY KEY,
-    city_id NUMBER, CONSTRAINT FK_wf_city FOREIGN KEY (city_id) REFERENCES z_city(city_id),
+    city_id NUMBER, CONSTRAINT FK_wf_city FOREIGN KEY (city_id) REFERENCES z_city(city_id) ON DELETE CASCADE,
     datetime DATE,
     tempmax NUMBER,
     tempmin NUMBER,
@@ -43,7 +43,7 @@ CREATE TABLE z_weather(
 
 CREATE TABLE z_astrology(
     astrology_id NUMBER PRIMARY KEY, 
-    weather_id NUMBER, CONSTRAINT FK_astrology_weather FOREIGN KEY (weather_id) REFERENCES z_weather(weather_id),
+    weather_id NUMBER, CONSTRAINT FK_astrology_weather FOREIGN KEY (weather_id) REFERENCES z_weather(weather_id) ON DELETE CASCADE,
     sunrise TIMESTAMP,
     sunset TIMESTAMP,
     moonphase NUMBER
@@ -51,7 +51,7 @@ CREATE TABLE z_astrology(
 
 CREATE TABLE z_desc(
     desc_id NUMBER PRIMARY KEY, 
-    weather_id NUMBER, CONSTRAINT FK_desc_weather FOREIGN KEY (weather_id) REFERENCES z_weather(weather_id),
+    weather_id NUMBER, CONSTRAINT FK_desc_weather FOREIGN KEY (weather_id) REFERENCES z_weather(weather_id) ON DELETE CASCADE,
     conditions VARCHAR(100),
     description VARCHAR(500)
 );
@@ -96,4 +96,106 @@ CREATE OR REPLACE TRIGGER z_desc_auto_increment
 BEFORE INSERT ON z_desc FOR EACH ROW
 BEGIN
     SELECT z_desc_seq.NEXTVAL INTO :NEW.desc_id FROM DUAL;
+END;
+
+/* ARCHIVE TABLES */
+
+CREATE TABLE z_country_archive(
+    country_archive_id NUMBER PRIMARY KEY, 
+    name VARCHAR2(100)
+);
+
+
+CREATE TABLE z_region_archive(
+    region_archive_id NUMBER PRIMARY KEY, 
+    name VARCHAR2(100),
+    country_archive_id NUMBER, CONSTRAINT FK_region_country_archive FOREIGN KEY (country_archive_id) REFERENCES z_country_archive(country_archive_id) ON DELETE CASCADE
+);
+
+CREATE TABLE z_city_archive(
+    city_archive_id NUMBER PRIMARY KEY, 
+    name VARCHAR2(100),
+    region_archive_id NUMBER, CONSTRAINT FK_city_region_archive FOREIGN KEY (region_archive_id) REFERENCES z_region_archive(region_archive_id) ON DELETE CASCADE
+);
+
+CREATE TABLE z_weather_archive(
+    weather_archive_id NUMBER PRIMARY KEY,
+    city_archive_id NUMBER, CONSTRAINT FK_wf_city_archive FOREIGN KEY (city_archive_id) REFERENCES z_city_archive(city_archive_id) ON DELETE CASCADE,
+    datetime DATE,
+    tempmax NUMBER,
+    tempmin NUMBER,
+    temp NUMBER,
+    feelslikemax NUMBER,
+    feelslikemin NUMBER,
+    feelslike NUMBER,
+    dew NUMBER,
+    humidity NUMBER,
+    precip NUMBER,
+    precipcover NUMBER,
+    preciptype VARCHAR2(50),
+    snow NUMBER,
+    snowdepth NUMBER,
+    windgust NUMBER,
+    windspeed NUMBER,
+    winddir NUMBER,
+    sealevelpressure NUMBER,
+    cloudcover NUMBER,
+    visibility NUMBER
+);
+
+CREATE TABLE z_astrology_archive(
+    astrology_archive_id NUMBER PRIMARY KEY, 
+    weather_archive_id NUMBER, CONSTRAINT FK_astrology_weather_archive FOREIGN KEY (weather_archive_id) REFERENCES z_weather_archive(weather_archive_id) ON DELETE CASCADE,
+    sunrise TIMESTAMP,
+    sunset TIMESTAMP,
+    moonphase NUMBER
+);
+
+CREATE TABLE z_desc_archive(
+    desc_archive_id NUMBER PRIMARY KEY, 
+    weather_archive_id NUMBER, CONSTRAINT FK_desc_weather_archive FOREIGN KEY (weather_archive_id) REFERENCES z_weather_archive(weather_archive_id) ON DELETE CASCADE,
+    conditions VARCHAR(100),
+    description VARCHAR(500)
+);
+
+CREATE SEQUENCE z_country_archive_seq START WITH 1 INCREMENT BY 1;
+CREATE OR REPLACE TRIGGER z_country_archive_auto_increment
+BEFORE INSERT ON z_country_archive FOR EACH ROW
+BEGIN
+    SELECT z_country_archive_seq.NEXTVAL INTO :NEW.country_archive_id FROM DUAL;
+END;
+
+CREATE SEQUENCE z_region_archive_seq START WITH 1 INCREMENT BY 1;
+CREATE OR REPLACE TRIGGER z_region_archive_auto_increment
+BEFORE INSERT ON z_region_archive FOR EACH ROW
+BEGIN
+    SELECT z_region_archive_seq.NEXTVAL INTO :NEW.region_archive_id FROM DUAL;
+END;
+
+CREATE SEQUENCE z_city_archive_seq START WITH 1 INCREMENT BY 1;
+CREATE OR REPLACE TRIGGER z_city_archive_auto_increment
+BEFORE INSERT ON z_city_archive FOR EACH ROW
+BEGIN
+    SELECT z_city_archive_seq.NEXTVAL INTO :NEW.city_archive_id FROM DUAL;
+END;
+
+CREATE SEQUENCE z_weather_archive_seq START WITH 1 INCREMENT BY 1;
+CREATE OR REPLACE TRIGGER z_weather_archive_auto_increment
+BEFORE INSERT ON z_weather_archive FOR EACH ROW
+BEGIN
+    SELECT z_weather_archive_seq.NEXTVAL INTO :NEW.weather_archive_id FROM DUAL;
+END;
+
+CREATE SEQUENCE z_astrology_archive_seq START WITH 1 INCREMENT BY 1;
+CREATE OR REPLACE TRIGGER z_astrology_archive_auto_increment
+BEFORE INSERT ON z_astrology_archive FOR EACH ROW
+BEGIN
+    SELECT z_astrology_archive_seq.NEXTVAL INTO :NEW.astrology_archive_id FROM DUAL;
+END;
+
+CREATE SEQUENCE z_desc_archive_seq START WITH 1 INCREMENT BY 1;
+CREATE OR REPLACE TRIGGER z_desc_archive_auto_increment
+BEFORE INSERT ON z_desc_archive FOR EACH ROW
+BEGIN
+    SELECT z_desc_archive_seq.NEXTVAL INTO :NEW.desc_archive_id FROM DUAL;
 END;
