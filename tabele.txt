@@ -44,8 +44,8 @@ CREATE TABLE z_weather(
 CREATE TABLE z_astrology(
     astrology_id NUMBER PRIMARY KEY, 
     weather_id NUMBER, CONSTRAINT FK_astrology_weather FOREIGN KEY (weather_id) REFERENCES z_weather(weather_id),
-    sunrise DATE,
-    sunset DATE,
+    sunrise TIMESTAMP,
+    sunset TIMESTAMP,
     moonphase NUMBER
 );
 
