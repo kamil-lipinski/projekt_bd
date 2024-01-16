@@ -101,26 +101,26 @@ END;
 /* ARCHIVE TABLES */
 
 CREATE TABLE z_country_archive(
-    country_archive_id NUMBER PRIMARY KEY, 
+    country_id NUMBER PRIMARY KEY, 
     name VARCHAR2(100)
 );
 
 
 CREATE TABLE z_region_archive(
-    region_archive_id NUMBER PRIMARY KEY, 
+    region_id NUMBER PRIMARY KEY, 
     name VARCHAR2(100),
-    country_archive_id NUMBER, CONSTRAINT FK_region_country_archive FOREIGN KEY (country_archive_id) REFERENCES z_country_archive(country_archive_id) ON DELETE CASCADE
+    country_id NUMBER, CONSTRAINT FK_region_country_archive FOREIGN KEY (country_id) REFERENCES z_country_archive(country_id) ON DELETE CASCADE
 );
 
 CREATE TABLE z_city_archive(
-    city_archive_id NUMBER PRIMARY KEY, 
+    city_id NUMBER PRIMARY KEY, 
     name VARCHAR2(100),
-    region_archive_id NUMBER, CONSTRAINT FK_city_region_archive FOREIGN KEY (region_archive_id) REFERENCES z_region_archive(region_archive_id) ON DELETE CASCADE
+    region_id NUMBER, CONSTRAINT FK_city_region_archive FOREIGN KEY (region_id) REFERENCES z_region_archive(region_id) ON DELETE CASCADE
 );
 
 CREATE TABLE z_weather_archive(
-    weather_archive_id NUMBER PRIMARY KEY,
-    city_archive_id NUMBER, CONSTRAINT FK_wf_city_archive FOREIGN KEY (city_archive_id) REFERENCES z_city_archive(city_archive_id) ON DELETE CASCADE,
+    weather_id NUMBER PRIMARY KEY,
+    city_id NUMBER, CONSTRAINT FK_wf_city_archive FOREIGN KEY (city_id) REFERENCES z_city_archive(city_id) ON DELETE CASCADE,
     datetime DATE,
     tempmax NUMBER,
     tempmin NUMBER,
@@ -144,16 +144,16 @@ CREATE TABLE z_weather_archive(
 );
 
 CREATE TABLE z_astrology_archive(
-    astrology_archive_id NUMBER PRIMARY KEY, 
-    weather_archive_id NUMBER, CONSTRAINT FK_astrology_weather_archive FOREIGN KEY (weather_archive_id) REFERENCES z_weather_archive(weather_archive_id) ON DELETE CASCADE,
+    astrology_id NUMBER PRIMARY KEY, 
+    weather_id NUMBER, CONSTRAINT FK_astrology_weather_archive FOREIGN KEY (weather_id) REFERENCES z_weather_archive(weather_id) ON DELETE CASCADE,
     sunrise TIMESTAMP,
     sunset TIMESTAMP,
     moonphase NUMBER
 );
 
 CREATE TABLE z_desc_archive(
-    desc_archive_id NUMBER PRIMARY KEY, 
-    weather_archive_id NUMBER, CONSTRAINT FK_desc_weather_archive FOREIGN KEY (weather_archive_id) REFERENCES z_weather_archive(weather_archive_id) ON DELETE CASCADE,
+    desc_id NUMBER PRIMARY KEY, 
+    weather_id NUMBER, CONSTRAINT FK_desc_weather_archive FOREIGN KEY (weather_id) REFERENCES z_weather_archive(weather_id) ON DELETE CASCADE,
     conditions VARCHAR(100),
     description VARCHAR(500)
 );
@@ -165,7 +165,7 @@ CREATE OR REPLACE TRIGGER z_archive_country
 BEFORE DELETE ON z_country
 FOR EACH ROW
 BEGIN
-  INSERT INTO z_country_archive (country_archive_id, name)
+  INSERT INTO z_country_archive (country_id, name)
   VALUES (:OLD.country_id, :OLD.name);
 END;
 
@@ -173,7 +173,7 @@ CREATE OR REPLACE TRIGGER z_archive_region
 BEFORE DELETE ON z_region
 FOR EACH ROW
 BEGIN
-  INSERT INTO z_region_archive (region_archive_id, name, country_archive_id)
+  INSERT INTO z_region_archive (region_id, name, country_id)
   VALUES (:OLD.region_id, :OLD.name, :OLD.country_id);
 END;
 
@@ -181,7 +181,7 @@ CREATE OR REPLACE TRIGGER z_archive_city
 BEFORE DELETE ON z_city
 FOR EACH ROW
 BEGIN
-  INSERT INTO z_city_archive (city_archive_id, name, region_archive_id)
+  INSERT INTO z_city_archive (city_id, name, region_id)
   VALUES (:OLD.city_id, :OLD.name, :OLD.region_id);
 END;
 
@@ -189,7 +189,7 @@ CREATE OR REPLACE TRIGGER z_archive_weather
 BEFORE DELETE ON z_weather
 FOR EACH ROW
 BEGIN
-  INSERT INTO z_weather_archive (weather_archive_id, city_archive_id, datetime, 
+  INSERT INTO z_weather_archive (weather_id, city_id, datetime, 
   tempmax, tempmin, temp, feelslikemax, feelslikemin, feelslike, dew, humidity,
   precip, precipcover, preciptype, snow, snowdepth, windgust, windspeed, winddir,
   sealevelpressure, cloudcover, visibility)
@@ -204,7 +204,7 @@ CREATE OR REPLACE TRIGGER z_archive_astrology
 BEFORE DELETE ON z_astrology
 FOR EACH ROW
 BEGIN
-  INSERT INTO z_astrology_archive (astrology_archive_id, weather_archive_id, sunrise, sunset, moonphase)
+  INSERT INTO z_astrology_archive (astrology_id, weather_id, sunrise, sunset, moonphase)
   VALUES (:OLD.astrology_id, :OLD.weather_id, :OLD.sunrise, :OLD.sunset, :OLD.moonphase);
 END;
 
@@ -212,6 +212,6 @@ CREATE OR REPLACE TRIGGER z_archive_desc
 BEFORE DELETE ON z_desc
 FOR EACH ROW
 BEGIN
-  INSERT INTO z_desc_archive (desc_archive_id, weather_archive_id, conditions, description)
+  INSERT INTO z_desc_archive (desc_id, weather_id, conditions, description)
   VALUES (:OLD.desc_id, :OLD.weather_id, :OLD.conditions, :OLD.description);
 END;
