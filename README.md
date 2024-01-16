@@ -1,7 +1,4 @@
-Projekt Zaliczeniowy
-
-Statystyka, Bazy Danych
-
+Projekt Zaliczeniowy - Statystyka, Bazy Danych
 
 Kamil Lipiński 155069
 
