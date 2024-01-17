@@ -1729,6 +1729,8 @@ EXCEPTION
 END z_get_desc_id;
 /
 
+/* SELECT FUNCTIONS */
+
 CREATE OR REPLACE FUNCTION z_get_weather_info_all(
     p_start_date VARCHAR2 DEFAULT NULL,
     p_end_date VARCHAR2 DEFAULT NULL
