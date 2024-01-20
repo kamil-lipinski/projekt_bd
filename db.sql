@@ -1,6 +1,6 @@
 SET SERVEROUTPUT ON;
 
-/* MAIN TABLES */
+/* MAIN TABLES  */
 
 CREATE TABLE z_country(
     country_id NUMBER PRIMARY KEY, 
