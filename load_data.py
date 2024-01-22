@@ -11,11 +11,20 @@ connection = oracledb.connect(
     dsn='213.184.8.44:1521/orcl')
 
 city = 'Plock'
+
 # key = '2LUQHNEL4NZN8LLPCZQRNVZ8D'
-key='4GKB6Z753DTNTWBFMERDJHFJV'
+# key = '4GKB6Z753DTNTWBFMERDJHFJV'
+# key = 'QNPT9BGVYW4RS583JSTVH6T5M'
+# key = 'J4QCJEMKLAZW8E55GR9KHUL2P'
+# key = 'YTRJPA8UXQDTLQHT96TRUYDZ2'
+# key = 'EAEQ84B8E7Z9579384LQU6XLJ'
+# key = 'PT3MQBRJCD2AJF5FG4XJ5PNDG'
+# key = 'JZPHDBTLY9W4MS89HSUB6PYJK'
+key = '9UYDETDNKGBXT98FRYVD4WPWA'
 
 try:
     ResultBytes = urllib.request.urlopen(
+        # f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city}/2023-01-01/2024-01-21"
         f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city}/last30days"
         "?unitGroup=metric&elements=datetime%2Cname%2Ctempmax%2Ctempmin%2Ctemp%2Cfeelslikemax%2Cfeelslikemin"
         "%2Cfeelslike%2Cdew%2Chumidity%2Cprecip%2Cprecipcover%2Cpreciptype%2Csnow%2Csnowdepth%2Cwindgust%2Cwindspeed"
