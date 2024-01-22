@@ -124,20 +124,20 @@ CREATE TABLE z_country_archive(
 CREATE TABLE z_region_archive(
     region_id NUMBER PRIMARY KEY, 
     name VARCHAR2(100),
-    country_id NUMBER, CONSTRAINT FK_region_country_archive FOREIGN KEY (country_id) REFERENCES z_country_archive(country_id) ON DELETE CASCADE
+    country_id NUMBER
 );
 /
 
 CREATE TABLE z_city_archive(
     city_id NUMBER PRIMARY KEY, 
     name VARCHAR2(100),
-    region_id NUMBER, CONSTRAINT FK_city_region_archive FOREIGN KEY (region_id) REFERENCES z_region_archive(region_id) ON DELETE CASCADE
+    region_id NUMBER
 );
 /
 
 CREATE TABLE z_weather_archive(
     weather_id NUMBER PRIMARY KEY,
-    city_id NUMBER, CONSTRAINT FK_wf_city_archive FOREIGN KEY (city_id) REFERENCES z_city_archive(city_id) ON DELETE CASCADE,
+    city_id NUMBER,
     datetime DATE,
     tempmax NUMBER,
     tempmin NUMBER,
@@ -163,7 +163,7 @@ CREATE TABLE z_weather_archive(
 
 CREATE TABLE z_astrology_archive(
     astrology_id NUMBER PRIMARY KEY, 
-    weather_id NUMBER, CONSTRAINT FK_astrology_weather_archive FOREIGN KEY (weather_id) REFERENCES z_weather_archive(weather_id) ON DELETE CASCADE,
+    weather_id NUMBER,
     sunrise TIMESTAMP,
     sunset TIMESTAMP,
     moonphase NUMBER
@@ -172,7 +172,7 @@ CREATE TABLE z_astrology_archive(
 
 CREATE TABLE z_desc_archive(
     desc_id NUMBER PRIMARY KEY, 
-    weather_id NUMBER, CONSTRAINT FK_desc_weather_archive FOREIGN KEY (weather_id) REFERENCES z_weather_archive(weather_id) ON DELETE CASCADE,
+    weather_id NUMBER,
     conditions VARCHAR(100),
     description VARCHAR(500)
 );
