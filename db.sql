@@ -2165,7 +2165,7 @@ BEGIN
 END;
 /
 
-CREATE OR REPLACE FUNCTION z_get_weather_avg_quaterly_info_country(
+CREATE OR REPLACE FUNCTION z_get_weather_avg_quarterly_info_country(
     p_country_name VARCHAR2,
     p_year VARCHAR2
 )
@@ -2176,7 +2176,7 @@ BEGIN
     OPEN v_cursor FOR   
     SELECT
         c.name AS country,
-        TO_CHAR(w.datetime, 'YYYY-Q') AS quater,
+        TO_CHAR(w.datetime, 'YYYY-Q') AS quarter,
         ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
         ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
         ROUND(AVG(w.temp), 1) AS avg_temp,
@@ -2208,7 +2208,7 @@ BEGIN
 END;
 /
 
-CREATE OR REPLACE FUNCTION z_get_weather_avg_quaterly_info_region(
+CREATE OR REPLACE FUNCTION z_get_weather_avg_quarterly_info_region(
     p_region_name VARCHAR2,
     p_year VARCHAR2
 )
@@ -2219,7 +2219,7 @@ BEGIN
     OPEN v_cursor FOR   
     SELECT
         r.name AS region,
-        TO_CHAR(w.datetime, 'YYYY-Q') AS quater,
+        TO_CHAR(w.datetime, 'YYYY-Q') AS quarter,
         ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
         ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
         ROUND(AVG(w.temp), 1) AS avg_temp,
@@ -2251,7 +2251,7 @@ BEGIN
 END;
 /
 
-CREATE OR REPLACE FUNCTION z_get_weather_avg_quaterly_info_city(
+CREATE OR REPLACE FUNCTION z_get_weather_avg_quarterly_info_city(
     p_city_name VARCHAR2,
     p_year VARCHAR2
 )
@@ -2262,7 +2262,7 @@ BEGIN
     OPEN v_cursor FOR   
     SELECT
         ct.name AS city,
-        TO_CHAR(w.datetime, 'YYYY-Q') AS quater,
+        TO_CHAR(w.datetime, 'YYYY-Q') AS quarter,
         ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
         ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
         ROUND(AVG(w.temp), 1) AS avg_temp,
