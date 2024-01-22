@@ -2034,3 +2034,384 @@ BEGIN
     
     RETURN v_cursor;
 END;
+/
+
+CREATE OR REPLACE FUNCTION z_get_weather_avg_monthly_info_country(
+    p_country_name VARCHAR2,
+    p_year VARCHAR2
+)
+RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR   
+    SELECT
+        c.name AS country,
+        TO_CHAR(w.datetime, 'YYYY-MM') AS month,
+        ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
+        ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
+        ROUND(AVG(w.temp), 1) AS avg_temp,
+        ROUND(AVG(w.feelslikemax), 1) AS avg_feelslikemax,
+        ROUND(AVG(w.feelslikemin), 1) AS avg_feelslikemin,
+        ROUND(AVG(w.feelslike), 1) AS avg_feelslike,
+        ROUND(AVG(w.dew), 1) AS avg_dew,
+        ROUND(AVG(w.humidity), 1) AS avg_humidity,
+        ROUND(AVG(w.precip), 1) AS avg_precip,
+        ROUND(AVG(w.precipcover), 1) AS avg_precipcover,
+        ROUND(AVG(w.snow), 1) AS avg_snow,
+        ROUND(AVG(w.snowdepth), 1) AS avg_snowdepth,
+        ROUND(AVG(w.windgust), 1) AS avg_windgust,
+        ROUND(AVG(w.windspeed), 1) AS avg_windspeed,
+        ROUND(AVG(w.winddir), 1) AS avg_winddir,
+        ROUND(AVG(w.sealevelpressure), 1) AS avg_sealevelpressure,
+        ROUND(AVG(w.cloudcover), 1) AS avg_cloudcover,
+        ROUND(AVG(w.visibility), 1) AS avg_visibility
+    FROM z_country c
+    JOIN z_region r ON c.country_id = r.country_id
+    JOIN z_city ct ON r.region_id = ct.region_id
+    JOIN z_weather w ON ct.city_id = w.city_id
+    WHERE UPPER(c.name) = UPPER(p_country_name)
+        AND EXTRACT(YEAR FROM w.datetime) = TO_NUMBER(p_year)
+    GROUP BY c.name, TO_CHAR(w.datetime, 'YYYY-MM')
+    ORDER BY TO_CHAR(w.datetime, 'YYYY-MM');
+    
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION z_get_weather_avg_monthly_info_region(
+    p_region_name VARCHAR2,
+    p_year VARCHAR2
+)
+RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR   
+    SELECT
+        r.name AS region,
+        TO_CHAR(w.datetime, 'YYYY-MM') AS month,
+        ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
+        ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
+        ROUND(AVG(w.temp), 1) AS avg_temp,
+        ROUND(AVG(w.feelslikemax), 1) AS avg_feelslikemax,
+        ROUND(AVG(w.feelslikemin), 1) AS avg_feelslikemin,
+        ROUND(AVG(w.feelslike), 1) AS avg_feelslike,
+        ROUND(AVG(w.dew), 1) AS avg_dew,
+        ROUND(AVG(w.humidity), 1) AS avg_humidity,
+        ROUND(AVG(w.precip), 1) AS avg_precip,
+        ROUND(AVG(w.precipcover), 1) AS avg_precipcover,
+        ROUND(AVG(w.snow), 1) AS avg_snow,
+        ROUND(AVG(w.snowdepth), 1) AS avg_snowdepth,
+        ROUND(AVG(w.windgust), 1) AS avg_windgust,
+        ROUND(AVG(w.windspeed), 1) AS avg_windspeed,
+        ROUND(AVG(w.winddir), 1) AS avg_winddir,
+        ROUND(AVG(w.sealevelpressure), 1) AS avg_sealevelpressure,
+        ROUND(AVG(w.cloudcover), 1) AS avg_cloudcover,
+        ROUND(AVG(w.visibility), 1) AS avg_visibility
+    FROM z_country c
+    JOIN z_region r ON c.country_id = r.country_id
+    JOIN z_city ct ON r.region_id = ct.region_id
+    JOIN z_weather w ON ct.city_id = w.city_id
+    WHERE UPPER(r.name) = UPPER(p_region_name)
+        AND EXTRACT(YEAR FROM w.datetime) = TO_NUMBER(p_year)
+    GROUP BY r.name, TO_CHAR(w.datetime, 'YYYY-MM')
+    ORDER BY TO_CHAR(w.datetime, 'YYYY-MM');
+    
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION z_get_weather_avg_monthly_info_city(
+    p_city_name VARCHAR2,
+    p_year VARCHAR2
+)
+RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR   
+    SELECT
+        ct.name AS city,
+        TO_CHAR(w.datetime, 'YYYY-MM') AS month,
+        ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
+        ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
+        ROUND(AVG(w.temp), 1) AS avg_temp,
+        ROUND(AVG(w.feelslikemax), 1) AS avg_feelslikemax,
+        ROUND(AVG(w.feelslikemin), 1) AS avg_feelslikemin,
+        ROUND(AVG(w.feelslike), 1) AS avg_feelslike,
+        ROUND(AVG(w.dew), 1) AS avg_dew,
+        ROUND(AVG(w.humidity), 1) AS avg_humidity,
+        ROUND(AVG(w.precip), 1) AS avg_precip,
+        ROUND(AVG(w.precipcover), 1) AS avg_precipcover,
+        ROUND(AVG(w.snow), 1) AS avg_snow,
+        ROUND(AVG(w.snowdepth), 1) AS avg_snowdepth,
+        ROUND(AVG(w.windgust), 1) AS avg_windgust,
+        ROUND(AVG(w.windspeed), 1) AS avg_windspeed,
+        ROUND(AVG(w.winddir), 1) AS avg_winddir,
+        ROUND(AVG(w.sealevelpressure), 1) AS avg_sealevelpressure,
+        ROUND(AVG(w.cloudcover), 1) AS avg_cloudcover,
+        ROUND(AVG(w.visibility), 1) AS avg_visibility
+    FROM z_country c
+    JOIN z_region r ON c.country_id = r.country_id
+    JOIN z_city ct ON r.region_id = ct.region_id
+    JOIN z_weather w ON ct.city_id = w.city_id
+    WHERE UPPER(ct.name) = UPPER(p_city_name)
+        AND EXTRACT(YEAR FROM w.datetime) = TO_NUMBER(p_year)
+    GROUP BY ct.name, TO_CHAR(w.datetime, 'YYYY-MM')
+    ORDER BY TO_CHAR(w.datetime, 'YYYY-MM');
+    
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION z_get_weather_avg_quaterly_info_country(
+    p_country_name VARCHAR2,
+    p_year VARCHAR2
+)
+RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR   
+    SELECT
+        c.name AS country,
+        TO_CHAR(w.datetime, 'YYYY-Q') AS quater,
+        ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
+        ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
+        ROUND(AVG(w.temp), 1) AS avg_temp,
+        ROUND(AVG(w.feelslikemax), 1) AS avg_feelslikemax,
+        ROUND(AVG(w.feelslikemin), 1) AS avg_feelslikemin,
+        ROUND(AVG(w.feelslike), 1) AS avg_feelslike,
+        ROUND(AVG(w.dew), 1) AS avg_dew,
+        ROUND(AVG(w.humidity), 1) AS avg_humidity,
+        ROUND(AVG(w.precip), 1) AS avg_precip,
+        ROUND(AVG(w.precipcover), 1) AS avg_precipcover,
+        ROUND(AVG(w.snow), 1) AS avg_snow,
+        ROUND(AVG(w.snowdepth), 1) AS avg_snowdepth,
+        ROUND(AVG(w.windgust), 1) AS avg_windgust,
+        ROUND(AVG(w.windspeed), 1) AS avg_windspeed,
+        ROUND(AVG(w.winddir), 1) AS avg_winddir,
+        ROUND(AVG(w.sealevelpressure), 1) AS avg_sealevelpressure,
+        ROUND(AVG(w.cloudcover), 1) AS avg_cloudcover,
+        ROUND(AVG(w.visibility), 1) AS avg_visibility
+    FROM z_country c
+    JOIN z_region r ON c.country_id = r.country_id
+    JOIN z_city ct ON r.region_id = ct.region_id
+    JOIN z_weather w ON ct.city_id = w.city_id
+    WHERE UPPER(c.name) = UPPER(p_country_name)
+        AND EXTRACT(YEAR FROM w.datetime) = TO_NUMBER(p_year)
+    GROUP BY c.name, TO_CHAR(w.datetime, 'YYYY-Q')
+    ORDER BY TO_CHAR(w.datetime, 'YYYY-Q');
+    
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION z_get_weather_avg_quaterly_info_region(
+    p_region_name VARCHAR2,
+    p_year VARCHAR2
+)
+RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR   
+    SELECT
+        r.name AS region,
+        TO_CHAR(w.datetime, 'YYYY-Q') AS quater,
+        ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
+        ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
+        ROUND(AVG(w.temp), 1) AS avg_temp,
+        ROUND(AVG(w.feelslikemax), 1) AS avg_feelslikemax,
+        ROUND(AVG(w.feelslikemin), 1) AS avg_feelslikemin,
+        ROUND(AVG(w.feelslike), 1) AS avg_feelslike,
+        ROUND(AVG(w.dew), 1) AS avg_dew,
+        ROUND(AVG(w.humidity), 1) AS avg_humidity,
+        ROUND(AVG(w.precip), 1) AS avg_precip,
+        ROUND(AVG(w.precipcover), 1) AS avg_precipcover,
+        ROUND(AVG(w.snow), 1) AS avg_snow,
+        ROUND(AVG(w.snowdepth), 1) AS avg_snowdepth,
+        ROUND(AVG(w.windgust), 1) AS avg_windgust,
+        ROUND(AVG(w.windspeed), 1) AS avg_windspeed,
+        ROUND(AVG(w.winddir), 1) AS avg_winddir,
+        ROUND(AVG(w.sealevelpressure), 1) AS avg_sealevelpressure,
+        ROUND(AVG(w.cloudcover), 1) AS avg_cloudcover,
+        ROUND(AVG(w.visibility), 1) AS avg_visibility
+    FROM z_country c
+    JOIN z_region r ON c.country_id = r.country_id
+    JOIN z_city ct ON r.region_id = ct.region_id
+    JOIN z_weather w ON ct.city_id = w.city_id
+    WHERE UPPER(r.name) = UPPER(p_region_name)
+        AND EXTRACT(YEAR FROM w.datetime) = TO_NUMBER(p_year)
+    GROUP BY r.name, TO_CHAR(w.datetime, 'YYYY-Q')
+    ORDER BY TO_CHAR(w.datetime, 'YYYY-Q');
+    
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION z_get_weather_avg_quaterly_info_city(
+    p_city_name VARCHAR2,
+    p_year VARCHAR2
+)
+RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR   
+    SELECT
+        ct.name AS city,
+        TO_CHAR(w.datetime, 'YYYY-Q') AS quater,
+        ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
+        ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
+        ROUND(AVG(w.temp), 1) AS avg_temp,
+        ROUND(AVG(w.feelslikemax), 1) AS avg_feelslikemax,
+        ROUND(AVG(w.feelslikemin), 1) AS avg_feelslikemin,
+        ROUND(AVG(w.feelslike), 1) AS avg_feelslike,
+        ROUND(AVG(w.dew), 1) AS avg_dew,
+        ROUND(AVG(w.humidity), 1) AS avg_humidity,
+        ROUND(AVG(w.precip), 1) AS avg_precip,
+        ROUND(AVG(w.precipcover), 1) AS avg_precipcover,
+        ROUND(AVG(w.snow), 1) AS avg_snow,
+        ROUND(AVG(w.snowdepth), 1) AS avg_snowdepth,
+        ROUND(AVG(w.windgust), 1) AS avg_windgust,
+        ROUND(AVG(w.windspeed), 1) AS avg_windspeed,
+        ROUND(AVG(w.winddir), 1) AS avg_winddir,
+        ROUND(AVG(w.sealevelpressure), 1) AS avg_sealevelpressure,
+        ROUND(AVG(w.cloudcover), 1) AS avg_cloudcover,
+        ROUND(AVG(w.visibility), 1) AS avg_visibility
+    FROM z_country c
+    JOIN z_region r ON c.country_id = r.country_id
+    JOIN z_city ct ON r.region_id = ct.region_id
+    JOIN z_weather w ON ct.city_id = w.city_id
+    WHERE UPPER(ct.name) = UPPER(p_city_name)
+        AND EXTRACT(YEAR FROM w.datetime) = TO_NUMBER(p_year)
+    GROUP BY ct.name, TO_CHAR(w.datetime, 'YYYY-Q')
+    ORDER BY TO_CHAR(w.datetime, 'YYYY-Q');
+    
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION z_get_weather_avg_yearly_info_country(
+    p_country_name VARCHAR2
+)
+RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR   
+    SELECT
+        c.name AS country,
+        TO_CHAR(w.datetime, 'YYYY') AS year,
+        ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
+        ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
+        ROUND(AVG(w.temp), 1) AS avg_temp,
+        ROUND(AVG(w.feelslikemax), 1) AS avg_feelslikemax,
+        ROUND(AVG(w.feelslikemin), 1) AS avg_feelslikemin,
+        ROUND(AVG(w.feelslike), 1) AS avg_feelslike,
+        ROUND(AVG(w.dew), 1) AS avg_dew,
+        ROUND(AVG(w.humidity), 1) AS avg_humidity,
+        ROUND(AVG(w.precip), 1) AS avg_precip,
+        ROUND(AVG(w.precipcover), 1) AS avg_precipcover,
+        ROUND(AVG(w.snow), 1) AS avg_snow,
+        ROUND(AVG(w.snowdepth), 1) AS avg_snowdepth,
+        ROUND(AVG(w.windgust), 1) AS avg_windgust,
+        ROUND(AVG(w.windspeed), 1) AS avg_windspeed,
+        ROUND(AVG(w.winddir), 1) AS avg_winddir,
+        ROUND(AVG(w.sealevelpressure), 1) AS avg_sealevelpressure,
+        ROUND(AVG(w.cloudcover), 1) AS avg_cloudcover,
+        ROUND(AVG(w.visibility), 1) AS avg_visibility
+    FROM z_country c
+    JOIN z_region r ON c.country_id = r.country_id
+    JOIN z_city ct ON r.region_id = ct.region_id
+    JOIN z_weather w ON ct.city_id = w.city_id
+    WHERE UPPER(c.name) = UPPER(p_country_name)
+    GROUP BY c.name, TO_CHAR(w.datetime, 'YYYY')
+    ORDER BY TO_CHAR(w.datetime, 'YYYY');
+    
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION z_get_weather_avg_yearly_info_region(
+    p_region_name VARCHAR2
+)
+RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR   
+    SELECT
+        r.name AS region,
+        TO_CHAR(w.datetime, 'YYYY') AS year,
+        ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
+        ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
+        ROUND(AVG(w.temp), 1) AS avg_temp,
+        ROUND(AVG(w.feelslikemax), 1) AS avg_feelslikemax,
+        ROUND(AVG(w.feelslikemin), 1) AS avg_feelslikemin,
+        ROUND(AVG(w.feelslike), 1) AS avg_feelslike,
+        ROUND(AVG(w.dew), 1) AS avg_dew,
+        ROUND(AVG(w.humidity), 1) AS avg_humidity,
+        ROUND(AVG(w.precip), 1) AS avg_precip,
+        ROUND(AVG(w.precipcover), 1) AS avg_precipcover,
+        ROUND(AVG(w.snow), 1) AS avg_snow,
+        ROUND(AVG(w.snowdepth), 1) AS avg_snowdepth,
+        ROUND(AVG(w.windgust), 1) AS avg_windgust,
+        ROUND(AVG(w.windspeed), 1) AS avg_windspeed,
+        ROUND(AVG(w.winddir), 1) AS avg_winddir,
+        ROUND(AVG(w.sealevelpressure), 1) AS avg_sealevelpressure,
+        ROUND(AVG(w.cloudcover), 1) AS avg_cloudcover,
+        ROUND(AVG(w.visibility), 1) AS avg_visibility
+    FROM z_country c
+    JOIN z_region r ON c.country_id = r.country_id
+    JOIN z_city ct ON r.region_id = ct.region_id
+    JOIN z_weather w ON ct.city_id = w.city_id
+    WHERE UPPER(r.name) = UPPER(p_region_name)
+    GROUP BY r.name, TO_CHAR(w.datetime, 'YYYY')
+    ORDER BY TO_CHAR(w.datetime, 'YYYY');
+    
+    RETURN v_cursor;
+END;
+/
+
+CREATE OR REPLACE FUNCTION z_get_weather_avg_yearly_info_city(
+    p_city_name VARCHAR2
+)
+RETURN SYS_REFCURSOR
+IS
+    v_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN v_cursor FOR   
+    SELECT
+        ct.name AS city,
+        TO_CHAR(w.datetime, 'YYYY') AS year,
+        ROUND(AVG(w.tempmax), 1) AS avg_tempmax,
+        ROUND(AVG(w.tempmin), 1) AS avg_tempmin,
+        ROUND(AVG(w.temp), 1) AS avg_temp,
+        ROUND(AVG(w.feelslikemax), 1) AS avg_feelslikemax,
+        ROUND(AVG(w.feelslikemin), 1) AS avg_feelslikemin,
+        ROUND(AVG(w.feelslike), 1) AS avg_feelslike,
+        ROUND(AVG(w.dew), 1) AS avg_dew,
+        ROUND(AVG(w.humidity), 1) AS avg_humidity,
+        ROUND(AVG(w.precip), 1) AS avg_precip,
+        ROUND(AVG(w.precipcover), 1) AS avg_precipcover,
+        ROUND(AVG(w.snow), 1) AS avg_snow,
+        ROUND(AVG(w.snowdepth), 1) AS avg_snowdepth,
+        ROUND(AVG(w.windgust), 1) AS avg_windgust,
+        ROUND(AVG(w.windspeed), 1) AS avg_windspeed,
+        ROUND(AVG(w.winddir), 1) AS avg_winddir,
+        ROUND(AVG(w.sealevelpressure), 1) AS avg_sealevelpressure,
+        ROUND(AVG(w.cloudcover), 1) AS avg_cloudcover,
+        ROUND(AVG(w.visibility), 1) AS avg_visibility
+    FROM z_country c
+    JOIN z_region r ON c.country_id = r.country_id
+    JOIN z_city ct ON r.region_id = ct.region_id
+    JOIN z_weather w ON ct.city_id = w.city_id
+    WHERE UPPER(ct.name) = UPPER(p_city_name)
+    GROUP BY ct.name, TO_CHAR(w.datetime, 'YYYY')
+    ORDER BY TO_CHAR(w.datetime, 'YYYY');
+    
+    RETURN v_cursor;
+END;
