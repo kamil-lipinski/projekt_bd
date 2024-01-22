@@ -1777,7 +1777,8 @@ BEGIN
     JOIN z_desc d ON w.weather_id = d.weather_id
     WHERE
         (p_start_date IS NULL OR w.datetime >= TO_DATE(p_start_date, 'DD-MM-YYYY'))
-        AND (p_end_date IS NULL OR w.datetime <= TO_DATE(p_end_date, 'DD-MM-YYYY'));
+        AND (p_end_date IS NULL OR w.datetime <= TO_DATE(p_end_date, 'DD-MM-YYYY'))
+    ORDER BY w.datetime;
 
     RETURN v_cursor;
 END;
@@ -1830,7 +1831,8 @@ BEGIN
     JOIN z_desc d ON w.weather_id = d.weather_id
     WHERE UPPER(c.name) = UPPER(p_country_name)
         AND (p_start_date IS NULL OR w.datetime >= TO_DATE(p_start_date, 'DD-MM-YYYY'))
-        AND (p_end_date IS NULL OR w.datetime <= TO_DATE(p_end_date, 'DD-MM-YYYY'));
+        AND (p_end_date IS NULL OR w.datetime <= TO_DATE(p_end_date, 'DD-MM-YYYY'))
+    ORDER BY w.datetime;
 
     RETURN v_cursor;
 END;
@@ -1883,7 +1885,8 @@ BEGIN
     JOIN z_desc d ON w.weather_id = d.weather_id
     WHERE UPPER(r.name) = UPPER(p_region_name)
         AND (p_start_date IS NULL OR w.datetime >= TO_DATE(p_start_date, 'DD-MM-YYYY'))
-        AND (p_end_date IS NULL OR w.datetime <= TO_DATE(p_end_date, 'DD-MM-YYYY'));
+        AND (p_end_date IS NULL OR w.datetime <= TO_DATE(p_end_date, 'DD-MM-YYYY'))
+    ORDER BY w.datetime;
 
     RETURN v_cursor;
 END;
@@ -1936,7 +1939,8 @@ BEGIN
     JOIN z_desc d ON w.weather_id = d.weather_id
     WHERE UPPER(ct.name) = UPPER(p_city_name)
         AND (p_start_date IS NULL OR w.datetime >= TO_DATE(p_start_date, 'DD-MM-YYYY'))
-        AND (p_end_date IS NULL OR w.datetime <= TO_DATE(p_end_date, 'DD-MM-YYYY'));
+        AND (p_end_date IS NULL OR w.datetime <= TO_DATE(p_end_date, 'DD-MM-YYYY'))
+    ORDER BY w.datetime;
 
     RETURN v_cursor;
 END;
